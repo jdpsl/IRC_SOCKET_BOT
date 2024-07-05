@@ -59,7 +59,8 @@ def execute_scripts(irc, message, channel, user):
         try:
             script_output = os.popen(command).read().strip()
             if script_output:
-                irc_send(irc, f"PRIVMSG {channel} :{script_output}")
+                for line in script_output.split('\n'):
+                    irc_send(irc, f"PRIVMSG {channel} :{line}")
                 print(f"Executed {script_name}: {script_output}")
         except Exception as e:
             print(f"Error executing {script_name}: {str(e)}")
