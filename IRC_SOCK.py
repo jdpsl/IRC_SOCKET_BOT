@@ -6,11 +6,15 @@ import time
 import glob
 from multiprocessing import Process
 
-server = "IRC.HOSTNAME"  # Example IRC server
-channel = "#Your Channel"  # Channel to join
+server = "IRC Server"  # Example IRC server
+channel = "#0x90"  # Channel to join
 botnick = "OoboT"  # Bot's nickname
 unix_socket_path = "/tmp/irc_bot_socket"  # Path to the Unix socket
 script_dir = "./scripts"  # Directory containing scripts
+
+def sanitize_input(input_str):
+    safe_chars = "-_.()! abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+    return ''.join(c for c in input_str if c in safe_chars)
 
 def irc_connect():
     irc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -47,7 +51,11 @@ def execute_scripts(irc, message, channel, user):
 
     for script_name in scripts:
         script_path = os.path.join(script_dir, script_name)
-        command = f"{script_path} \"{message}\" \"{channel}\" \"{user}\" \"{botnick}\""
+        sanitized_message = sanitize_input(message)
+        sanitized_channel = sanitize_input(channel)
+        sanitized_user = sanitize_input(user)
+        sanitized_botnick = sanitize_input(botnick)
+        command = f"{script_path} \"{sanitized_message}\" \"{sanitized_channel}\" \"{sanitized_user}\" \"{sanitized_botnick}\""
         try:
             script_output = os.popen(command).read().strip()
             if script_output:
