@@ -22,7 +22,7 @@ To send messages to a specific room or user, run the following command in a new 
 
 ```bash
 ./window.sh $room_or_user
-
+```
 
 
 ## Script Arguments
