@@ -18,14 +18,14 @@ message="$1"
 channel="$2"
 user="$3"
 botnick="$4"
-'''
+```
 
 ## Interaction with the Socket
 
 If you want to perform actions other than sending the standard message to a room or person, interact with the socket directly. For example, to poke someone:
 
-'''bash
+```bash
 echo "PRIVMSG #0x90 :Hello" | socat - UNIX-CONNECT:/tmp/irc_bot_socket
-'''
+```
 
 
