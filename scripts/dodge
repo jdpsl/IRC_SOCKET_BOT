@@ -1,0 +1,10 @@
+#!/bin/bash
+
+message="$1"
+channel="$2"
+user="$3"
+botnick="$4"
+
+if [[ "$message" == *ACTION* && "$message" == *"$botnick"* ]]; then
+    echo -e "\x01ACTION jumps out of the way\x01"
+fi
