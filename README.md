@@ -8,6 +8,23 @@ This project is a straightforward IRC client/bot.
 - **Dynamic Scripting**: Add scripts into the `scripts` folder, and the bot will execute them the next time it receives a line. No need to restart the bot or type reload commands.
 - **Automatic Execution**: Every time it receives a line from the server, it will execute each of the files in the `scripts` directory and send the output.
 
+## How to Run
+
+To run the bot, use the following command:
+
+```bash
+python3 irc_sock.py
+```
+
+## Sending to a Specific Room or User
+This project is meant to have everything split apart from the main bot that is running.
+To send messages to a specific room or user, run the following command in a new terminal:
+
+```bash
+./window.sh $room_or_user
+
+
+
 ## Script Arguments
 
 Scripts should follow this structure:
