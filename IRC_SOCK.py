@@ -1,12 +1,16 @@
+#!/usr/local/bin/python3
+
 import socket
 import os
 import time
+import glob
 from multiprocessing import Process
 
-server = "irc.freenode.net"  # Example IRC server
-channel = "#example_channel"  # Channel to join
-botnick = "SimpleIRCBot"  # Bot's nickname
+server = "IRC.HOSTNAME"  # Example IRC server
+channel = "#Your Channel"  # Channel to join
+botnick = "OoboT"  # Bot's nickname
 unix_socket_path = "/tmp/irc_bot_socket"  # Path to the Unix socket
+script_dir = "./scripts"  # Directory containing scripts
 
 def irc_connect():
     irc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -38,6 +42,20 @@ def handle_unix_socket(irc):
                 if command:
                     irc_send(irc, command)
 
+def execute_scripts(irc, message, channel, user):
+    scripts = [f for f in os.listdir(script_dir) if os.path.isfile(os.path.join(script_dir, f)) and os.access(os.path.join(script_dir, f), os.X_OK) and not f.startswith('.')]
+
+    for script_name in scripts:
+        script_path = os.path.join(script_dir, script_name)
+        command = f"{script_path} \"{message}\" \"{channel}\" \"{user}\" \"{botnick}\""
+        try:
+            script_output = os.popen(command).read().strip()
+            if script_output:
+                irc_send(irc, f"PRIVMSG {channel} :{script_output}")
+                print(f"Executed {script_name}: {script_output}")
+        except Exception as e:
+            print(f"Error executing {script_name}: {str(e)}")
+
 def main():
     irc = irc_connect()
 
@@ -54,10 +72,12 @@ def main():
                 irc_send(irc, f"PONG {msg.split()[1]}")
                 print(f"PONG {msg.split()[1]}")
 
-            if "VERSION" in msg and "PRIVMSG" in msg:
+            if "PRIVMSG" in msg:
                 user = msg.split('!')[0][1:]
-                irc_send(irc, f"NOTICE {user} :\x01VERSION SimpleIRCBot v1.0\x01")
-                print(f"NOTICE {user} :\x01VERSION SimpleIRCBot v1.0\x01")
+                channel = msg.split()[2]
+                message = ' '.join(msg.split()[3:])[1:]
+
+                execute_scripts(irc, message, channel, user)
 
     except KeyboardInterrupt:
         print("Bot is shutting down.")
