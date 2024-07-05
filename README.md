@@ -1,6 +1,6 @@
 # Simple IRC Client/Bot
 
-This project is a straightforward IRC client/bot.
+This project is a straightforward IRC client/bot that uses a socket for more advanced and non integrated scripts.
 
 ## Features
 
