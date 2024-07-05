@@ -1,0 +1,18 @@
+#!/bin/bash
+
+message="$1"
+channel="$2"
+user="$3"
+botnick="$4"
+
+# Splitting the message into words
+read -r first_word second_word <<< "$message"
+
+if [[ "$first_word" == "!poke" ]]; then
+    if [[ -z "$second_word" ]]; then
+        echo "Must give a user"
+    else
+        irc_command="PRIVMSG $second_word :POKE"
+        echo $irc_command | socat - UNIX-CONNECT:/tmp/irc_bot_socket
+    fi
+fi
