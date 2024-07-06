@@ -6,14 +6,15 @@ import time
 import glob
 from multiprocessing import Process
 
-server = "IRC Server"  # Example IRC server
+
+server = "irc.2600.net"  # Example IRC server
 channel = "#0x90"  # Channel to join
 botnick = "OoboT"  # Bot's nickname
 unix_socket_path = "/tmp/irc_bot_socket"  # Path to the Unix socket
 script_dir = "./scripts"  # Directory containing scripts
 
 def sanitize_input(input_str):
-    safe_chars = "-_.()! abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+    safe_chars = "-_.()!= abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
     return ''.join(c for c in input_str if c in safe_chars)
 
 def irc_connect():
@@ -35,7 +36,7 @@ def handle_unix_socket(irc):
     server_socket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
     server_socket.bind(unix_socket_path)
     server_socket.listen(1)
-    print(f"Unix socket listening at {unix_socket_path}")
+    print(f"[!] Unix socket listening at {unix_socket_path}")
 
     while True:
         conn, _ = server_socket.accept()
@@ -61,11 +62,21 @@ def execute_scripts(irc, message, channel, user):
             if script_output:
                 for line in script_output.split('\n'):
                     irc_send(irc, f"PRIVMSG {channel} :{line}")
-                print(f"Executed {script_name}: {script_output}")
+                print(f"[+] Executed {script_name}: {script_output}")
         except Exception as e:
-            print(f"Error executing {script_name}: {str(e)}")
+            print(f"[-] Error executing {script_name}: {str(e)}")
 
 def main():
+    print(" _____ _____   _____    _____  ____   _____ _  ________ _______ ")
+    print("|_   _|  __ \ / ____|  / ____|/ __ \ / ____| |/ /  ____|__   __|")
+    print("  | | | |__) | |      | (___ | |  | | |    | ' /| |__     | |   ")
+    print("  | | |  _  /| |       \___ \| |  | | |    |  < |  __|    | |   ")
+    print(" _| |_| | \ \| |____   ____) | |__| | |____| . \| |____   | |   ")
+    print("|_____|_|  \_\\_____| |_____/ \____/ \_____|_|\_\______|  |_|   ")
+    print("                   ______                                        ")
+    print("                  |______|                             ")
+
+    print("[!] Simple Bot is starting...")
     irc = irc_connect()
 
     process = Process(target=handle_unix_socket, args=(irc,))
@@ -89,9 +100,9 @@ def main():
                 execute_scripts(irc, message, channel, user)
 
     except KeyboardInterrupt:
-        print("Bot is shutting down.")
+        print("[!] Bot is shutting down.")
     except Exception as e:
-        print("Error:", str(e))
+        print("[-] Error:", str(e))
     finally:
         irc_send(irc, "QUIT :Bye!")
         irc.close()
