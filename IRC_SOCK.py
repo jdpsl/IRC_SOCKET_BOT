@@ -1,13 +1,18 @@
 #!/usr/local/bin/python3
 
+import sys
 import socket
 import os
 import time
 import glob
 from multiprocessing import Process
 
+if len(sys.argv) < 2:
+    print(f"Usage: python {sys.argv[0]} <server>")
 
-server = "irc.2600.net"  # Example IRC server
+    sys.exit(1)
+
+server = sys.argv[1]  # Example IRC server
 channel = "#0x90"  # Channel to join
 botnick = "OoboT"  # Bot's nickname
 unix_socket_path = "/tmp/irc_bot_socket"  # Path to the Unix socket
