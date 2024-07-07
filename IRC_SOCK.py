@@ -7,14 +7,16 @@ import time
 import glob
 from multiprocessing import Process
 
-if len(sys.argv) < 2:
-    print(f"Usage: python {sys.argv[0]} <server>")
-
+if len(sys.argv) < 4:
+    print(f"Usage: {sys.argv[0]} <server> <channel> <botnick>")
     sys.exit(1)
 
-server = sys.argv[1]  # Example IRC server
-channel = "#0x90"  # Channel to join
-botnick = "OoboT"  # Bot's nickname
+
+server = sys.argv[1]  # IRC server
+channel = sys.argv[2]  # Channel to join
+botnick = sys.argv[3]  # Bot's nickname
+
+
 unix_socket_path = "/tmp/irc_bot_socket"  # Path to the Unix socket
 script_dir = "./scripts"  # Directory containing scripts
 
