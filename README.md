@@ -55,4 +55,10 @@ If you want to perform actions other than sending the standard message to a room
 echo "PRIVMSG #0x90 :Hello" | socat - UNIX-CONNECT:/tmp/irc_bot_socket
 ```
 
+### Encrypted Messages
 
+Add a key to ***./etc/key***
+It will automatically decrypt messages sent by another user using this bot client when they use ***./encrypted_room.sh***
+```bash
+./encrypted_room.sh "#0x90" "password"
+```
