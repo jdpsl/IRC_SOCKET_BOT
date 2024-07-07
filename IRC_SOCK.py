@@ -1,27 +1,45 @@
-#!/usr/local/bin/python3
+#!/usr/bin/env python3
 
+import base64
 import sys
 import socket
 import os
 import time
 import glob
+import re
+
 from multiprocessing import Process
 
 if len(sys.argv) < 4:
     print(f"Usage: {sys.argv[0]} <server> <channel> <botnick>")
     sys.exit(1)
 
-
 server = sys.argv[1]  # IRC server
 channel = sys.argv[2]  # Channel to join
 botnick = sys.argv[3]  # Bot's nickname
 
+# Function to find the highest number in existing socket names
+def get_next_socket_number(server_name):
+    socket_prefix = f"/tmp/irc_socket_bot_{server_name}_"
+    highest_number = -1
+    for filename in os.listdir('/tmp'):
+        match = re.match(rf'irc_socket_bot_{server_name}_(\d+)', filename)
+        if match:
+            number = int(match.group(1))
+            if number > highest_number:
+                highest_number = number
+    return highest_number + 1
 
-unix_socket_path = "/tmp/irc_bot_socket"  # Path to the Unix socket
+# Determine the next socket number
+next_socket_number = get_next_socket_number(server)
+
+# Construct the unix socket path
+unix_socket_path = f"/tmp/irc_socket_bot_{server}_{next_socket_number}"
+
 script_dir = "./scripts"  # Directory containing scripts
 
 def sanitize_input(input_str):
-    safe_chars = "-_.()!= abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+    safe_chars = "-_.()!=/+ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\001"
     return ''.join(c for c in input_str if c in safe_chars)
 
 def irc_connect():
@@ -55,6 +73,9 @@ def handle_unix_socket(irc):
                     irc_send(irc, command)
 
 def execute_scripts(irc, message, channel, user):
+
+
+
     scripts = [f for f in os.listdir(script_dir) if os.path.isfile(os.path.join(script_dir, f)) and os.access(os.path.join(script_dir, f), os.X_OK) and not f.startswith('.')]
 
     for script_name in scripts:
@@ -93,6 +114,9 @@ def main():
         while True:
             msg = irc.recv(2048).decode()
             msg = msg.strip('\n\r')
+
+
+
             print(msg)
 
             if msg.startswith("PING"):
