@@ -1,0 +1,41 @@
+#!/bin/bash
+
+
+# Input message
+input_message="$1"
+channel="$2"
+user="$3"
+botnick="$4"
+
+# Check if the message starts with "!enc "
+if [[ "$input_message" == "!enc "* ]]; then
+    # Extract encrypted message from input
+    encrypted_message=$(echo "$input_message" | cut -d' ' -f2-)
+
+    # Read key from file
+    key_file="./etc/key"
+    if [ ! -f "$key_file" ]; then
+        echo "Error: Key file '$key_file' not found"
+        exit 1
+    fi
+    key=$(cat "$key_file")
+
+    # Function to decrypt a message using AES with OpenSSL
+    decrypt_message() {
+        local encrypted_message="$1"
+        local key="$2"
+        echo "$encrypted_message" | openssl enc -d -aes-256-cbc -base64 -pbkdf2 -pass pass:"$key"
+    }
+
+    # Decrypt the message
+    decrypted_message=$(decrypt_message "$encrypted_message" "$key")
+
+    # Check if decryption was successful
+    if [ $? -ne 0 ]; then
+        echo "Decryption failed"
+        exit 1
+    fi
+
+    # Echo the decrypted message
+    echo "[+] $user@$channel : $decrypted_message" >&2
+fi
