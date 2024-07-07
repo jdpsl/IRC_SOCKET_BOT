@@ -1,0 +1,88 @@
+#!/bin/bash
+
+message="$1"
+channel="$2"
+user="$3"
+botnick="$4"
+
+# ANSI color codes
+RED='\033[0;31m'  # Red color
+NC='\033[0m'      # No color (reset)
+
+# List of swear words (separated by spaces)
+swear_words=("fuck" "shit" "ass" "cunt" "kike" "jew" "nigger" "fag" "bitch")
+
+# Function to initialize SQLite database and table
+initialize_database() {
+    local db_file="./etc/badwords.db"
+    local sql_script="./etc/badwords.sql"
+
+    # Create SQLite database file if it doesn't exist
+    if [[ ! -f "$db_file" ]]; then
+        sqlite3 "$db_file" ""
+    fi
+
+    # Create SQL initialization script if it doesn't exist
+    if [[ ! -f "$sql_script" ]]; then
+        cat <<EOF > "$sql_script"
+CREATE TABLE IF NOT EXISTS badwords (
+    id INTEGER PRIMARY KEY,
+    user TEXT NOT NULL,
+    room TEXT NOT NULL,
+    number_of_swears INTEGER DEFAULT 0
+);
+EOF
+    fi
+
+    # Initialize database schema if necessary
+    sqlite3 "$db_file" < "$sql_script"
+}
+
+# Function to handle SQLite operations
+handle_sqlite() {
+    local db_file="./etc/badwords.db"
+
+    # Initialize database if it doesn't exist
+    if [[ ! -f "$db_file" ]]; then
+        initialize_database
+    fi
+
+    # Check if user already exists in the table for the given room
+    local count=$(sqlite3 "$db_file" "SELECT number_of_swears FROM badwords WHERE user='$user' AND room='$channel';")
+    if [[ -z "$count" ]]; then
+        # User does not exist, insert new record
+        sqlite3 "$db_file" "INSERT INTO badwords (user, room, number_of_swears) VALUES ('$user', '$channel', 1);"
+        count=1  # Set count to 1 for the first swear word
+    else
+        # User exists, update the count
+        let count++
+        sqlite3 "$db_file" "UPDATE badwords SET number_of_swears=$count WHERE user='$user' AND room='$channel';"
+    fi
+
+    echo "$count"
+}
+
+# Convert message to lowercase to handle case-insensitivity
+lowercase_message=$(echo "$message" | tr '[:upper:]' '[:lower:]')
+
+# Check if the message is "!bad"
+if [[ "$lowercase_message" == "!bad" ]]; then
+    # Print out the swear word count as a negative number in red
+    bad_count=$(handle_sqlite)
+    if [[ "$bad_count" -gt 0 ]]; then
+        echo -e "${RED}BAD COUNT: $user -$bad_count${NC}"
+    else
+        echo -e "${RED}No swear words recorded for $user in $channel.${NC}"
+    fi
+    exit 0
+fi
+
+# Check if the message contains any swear words
+for swear in "${swear_words[@]}"; do
+    if [[ $lowercase_message == *"$swear"* ]]; then
+        # Print "BAD WORD: $user -1" in red
+        echo -e "${RED}BAD: $user -1${NC}"
+        #handle_sqlite
+        exit 0
+    fi
+done
