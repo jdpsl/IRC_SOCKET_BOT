@@ -4,6 +4,7 @@ message="$1"
 channel="$2"
 user="$3"
 botnick="$4"
+theSocket="$5"
 
 # Splitting the message into words
 read -r first_word second_word <<< "$message"
@@ -12,7 +13,10 @@ if [[ "$first_word" == "!poke" ]]; then
     if [[ -z "$second_word" ]]; then
         echo "Must give a user"
     else
+        # Construct the IRC command to send a private message to the second word
         irc_command="PRIVMSG $second_word :POKE"
-        echo $irc_command | socat - UNIX-CONNECT:/tmp/irc_bot_socket
+        echo $irc_command >&2
+        # Print the IRC command (you would typically send this to your IRC bot/socket)
+        echo $irc_command | socat - UNIX-CONNECT:$theSocket
     fi
 fi
