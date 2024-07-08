@@ -19,11 +19,8 @@ botnick = sys.argv[3]  # Bot's nickname
 
 
 
+unix_socket_path = f"/tmp/irc_bot_socket_{server}_{botnick}"  # Path to the Unix socket
 
-
-
-
-unix_socket_path = "/tmp/irc_bot_socket"  # Path to the Unix socket
 script_dir = "./scripts"  # Directory containing scripts
 
 def sanitize_input(input_str):
@@ -72,7 +69,7 @@ def execute_scripts(irc, message, channel, user):
         sanitized_channel = sanitize_input(channel)
         sanitized_user = sanitize_input(user)
         sanitized_botnick = sanitize_input(botnick)
-        command = f"{script_path} \"{sanitized_message}\" \"{sanitized_channel}\" \"{sanitized_user}\" \"{sanitized_botnick}\""
+        command = f"{script_path} \"{sanitized_message}\" \"{sanitized_channel}\" \"{sanitized_user}\" \"{sanitized_botnick}\" \"{unix_socket_path}\""
         try:
             script_output = os.popen(command).read().strip()
             if script_output:
