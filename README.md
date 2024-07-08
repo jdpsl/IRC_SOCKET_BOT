@@ -74,3 +74,9 @@ Run the command below to list all bot sessions currently running. This will let 
 ```bash
 ./start_console
 ```
+
+### List all the current sockets
+
+```bash
+./list_sockets.sh
+```
