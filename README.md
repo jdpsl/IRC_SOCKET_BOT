@@ -29,7 +29,7 @@ python3 irc_sock.py <irc_server> <#default_channel> <bots nickname>
 
 ## Script Arguments
 
-Scripts should follow this structure:
+Scripts should follow this structure in the `scripts` folder:
 
 ```bash
 #!/bin/bash
