@@ -26,14 +26,6 @@ To run the bot, use the following command:
 python3 irc_sock.py <irc_server> <#default_channel> <bots nickname>
 ```
 
-## Sending to a Specific Room or User
-This project is meant to have everything split apart from the main bot that is running.
-To send messages to a specific room or user, run the following command in a new terminal:
-
-```bash
-./window.sh $room_or_user
-```
-
 
 ## Script Arguments
 
@@ -57,10 +49,28 @@ If you want to perform actions other than sending the standard message to a room
 echo "PRIVMSG #0x90 :Hello" | socat - UNIX-CONNECT:$thesocket
 ```
 
+
+## Sending to a Specific Room or User
+This project is meant to have everything split apart from the main bot that is running.
+To send messages to a specific room or user, run the following command in a new terminal:
+
+```bash
+./window.sh $room_or_user
+```
+
+
 ### Encrypted Messages
 
 Add a key to `./etc/key`
 It will automatically decrypt messages sent by another user using this bot client when they use `./encrypted_room.sh`
 ```bash
 ./encrypted_room.sh "#0x90" "password"
+```
+
+
+### The Console Script
+
+Run the command below to list all bot sessions currently running. This will let you choose which one you want to use and if you want it to be encrypted or unencrypted along with the user and room you want to interact with as a human.
+```bash
+./start_console
 ```
